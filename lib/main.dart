@@ -21,6 +21,81 @@ class TogyzKumalakBoard extends StatefulWidget {
   _TogyzKumalakBoardState createState() => _TogyzKumalakBoardState();
 }
 
+class WinnerPage extends StatelessWidget {
+  final String winnerName;
+  final Function resetGame;
+
+  WinnerPage(this.winnerName, this.resetGame);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Game End Page'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Winner: $winnerName',
+              style: TextStyle(fontSize: 24),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Reset game state here (score, board, etc.)
+                // You can call a function to reset the game state
+                resetGame();
+                // Navigate back to the game page
+                Navigator.pop(context);
+              },
+              child: Text('Restart Game'),
+            ),
+            // Add any other content you want to display on this page
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class DrawPage extends StatelessWidget {
+  final Function resetGame;
+
+  DrawPage(this.resetGame);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Game End Page'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Friendship wins!',
+              style: TextStyle(fontSize: 24),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Reset game state here (score, board, etc.)
+                // You can call a function to reset the game state
+                resetGame();
+                // Navigate back to the game page
+                Navigator.pop(context);
+              },
+              child: Text('Restart Game'),
+            ),
+            // Add any other content you want to display on this page
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _TogyzKumalakBoardState extends State<TogyzKumalakBoard> {
   List<List<int>> pitsPlayer =
       List.generate(2, (index) => List.generate(9, (index) => 9));
@@ -28,10 +103,48 @@ class _TogyzKumalakBoardState extends State<TogyzKumalakBoard> {
   // List<int> pitsPlayer2 = List.generate(9, (index) => 9); // Player 2's pits
   List<int> kazanPlayer = List.generate(2, (index) => 0);
   int currentPlayer = 0;
+  List<int> tuzdyq = List.generate(2, (index) => -1);
+
+  void resetGame() {
+    setState(() {
+      // Reset all game-related variables to their initial state
+      pitsPlayer = List.generate(2, (index) => List.generate(9, (index) => 9));
+      kazanPlayer = List.generate(2, (index) => 0);
+      currentPlayer = 0;
+      tuzdyq = List.generate(2, (index) => -1);
+    });
+  }
+
+  void gameEnd() {
+    String winnerName;
+    if (kazanPlayer[0] > kazanPlayer[1]) {
+      winnerName = "Player 1";
+    } else if (kazanPlayer[0] < kazanPlayer[1]) {
+      winnerName = "Player 2";
+    } else {
+      winnerName = "Draw";
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => DrawPage(resetGame)));
+    }
+    if (winnerName != "Draw")
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => WinnerPage(winnerName, resetGame)));
+  }
+
+  void checkMoves() {
+    bool end = true;
+    for (int i = 0; i < 9; i++) {
+      if (pitsPlayer[currentPlayer][i] > 2) end = false;
+    }
+    if (end == true) gameEnd();
+  }
 
   void makeMove(int pitIndex) {
     // Implement game logic here
     // Update pits, kazans, and currentPlayer accordingly
+    checkMoves();
     int temp = pitsPlayer[currentPlayer][pitIndex];
     int tempPlayer = currentPlayer;
     pitsPlayer[tempPlayer][pitIndex] = 0;
@@ -40,13 +153,26 @@ class _TogyzKumalakBoardState extends State<TogyzKumalakBoard> {
         tempPlayer = (tempPlayer + 1) % 2;
         pitIndex %= 9;
       }
+      if (pitIndex == tuzdyq[tempPlayer]) {
+        kazanPlayer[(tempPlayer + 1) % 2]++;
+        temp--;
+        if (temp > 0) pitIndex++;
+        continue;
+      }
       pitsPlayer[tempPlayer][pitIndex]++;
       temp--;
       if (temp == 0) continue;
       pitIndex++;
     }
     if (tempPlayer != currentPlayer) {
-      if (pitsPlayer[tempPlayer][pitIndex] % 2 == 0) {
+      if (pitsPlayer[tempPlayer][pitIndex] == 3 &&
+          pitIndex != 0 &&
+          pitIndex != 8 &&
+          tuzdyq[tempPlayer] == -1) {
+        tuzdyq[tempPlayer] = pitIndex;
+        kazanPlayer[currentPlayer] += pitsPlayer[tempPlayer][pitIndex];
+        pitsPlayer[tempPlayer][pitIndex] = 0;
+      } else if (pitsPlayer[tempPlayer][pitIndex] % 2 == 0) {
         kazanPlayer[currentPlayer] += pitsPlayer[tempPlayer][pitIndex];
         pitsPlayer[tempPlayer][pitIndex] = 0;
       }
@@ -72,6 +198,7 @@ class _TogyzKumalakBoardState extends State<TogyzKumalakBoard> {
                         makeMove(i);
                         // Call your game logic function
                         // After the move, toggle the currentPlayer
+                        if (kazanPlayer[0] > 81 || kazanPlayer[1] > 81) gameEnd();
                         setState(() {
                           currentPlayer = (currentPlayer + 1) % 2;
                         });
@@ -88,6 +215,7 @@ class _TogyzKumalakBoardState extends State<TogyzKumalakBoard> {
                             border: Border.all(
                               color: Colors.black,
                             ),
+                            color: i == tuzdyq[0] ? Colors.red : Colors.white,
                           ),
                           child: Center(
                             child: Text(
@@ -111,6 +239,7 @@ class _TogyzKumalakBoardState extends State<TogyzKumalakBoard> {
                       if (currentPlayer == 1 &&
                           pitsPlayer[currentPlayer][i] > 1) {
                         makeMove(i);
+                        if (kazanPlayer[0] > 81 || kazanPlayer[1] > 81) gameEnd();
                         // Call your game logic function
                         // After the move, toggle the currentPlayer
                         setState(() {
@@ -128,6 +257,7 @@ class _TogyzKumalakBoardState extends State<TogyzKumalakBoard> {
                             border: Border.all(
                               color: Colors.black,
                             ),
+                            color: i == tuzdyq[1] ? Colors.red : Colors.white,
                           ),
                           child: Center(
                             child: Text(
