@@ -136,9 +136,14 @@ class _TogyzKumalakBoardState extends State<TogyzKumalakBoard> {
   void checkMoves() {
     bool end = true;
     for (int i = 0; i < 9; i++) {
-      if (pitsPlayer[currentPlayer][i] > 2) end = false;
+      if (pitsPlayer[currentPlayer][i] > 0) end = false;
     }
-    if (end == true) gameEnd();
+    if (end == true) {
+      kazanPlayer[(currentPlayer + 1) % 2] += (162 -
+          kazanPlayer[currentPlayer] -
+          kazanPlayer[(currentPlayer + 1) % 2]);
+      gameEnd();
+    }
   }
 
   void makeMove(int pitIndex) {
@@ -148,6 +153,25 @@ class _TogyzKumalakBoardState extends State<TogyzKumalakBoard> {
     int temp = pitsPlayer[currentPlayer][pitIndex];
     int tempPlayer = currentPlayer;
     pitsPlayer[tempPlayer][pitIndex] = 0;
+    if (temp == 1) {
+      if (pitIndex == 8) {
+        if (tuzdyq[(currentPlayer + 1) % 2] == 0) {
+          kazanPlayer[currentPlayer]++;
+        } else {
+          pitsPlayer[(currentPlayer + 1) % 2][0]++;
+          tempPlayer = (currentPlayer + 1) % 2;
+          pitIndex = 0;
+        }
+      } else {
+        if (tuzdyq[currentPlayer] == pitIndex + 1)
+          kazanPlayer[(currentPlayer + 1) % 2]++;
+        else {
+          pitsPlayer[currentPlayer][pitIndex + 1]++;
+          pitIndex++;
+        }
+      }
+      temp = 0;
+    }
     while (temp > 0) {
       if (pitIndex == 9) {
         tempPlayer = (tempPlayer + 1) % 2;
@@ -166,8 +190,8 @@ class _TogyzKumalakBoardState extends State<TogyzKumalakBoard> {
     }
     if (tempPlayer != currentPlayer) {
       if (pitsPlayer[tempPlayer][pitIndex] == 3 &&
-          pitIndex != 0 &&
           pitIndex != 8 &&
+          tuzdyq[(tempPlayer + 1) % 2] != pitIndex &&
           tuzdyq[tempPlayer] == -1) {
         tuzdyq[tempPlayer] = pitIndex;
         kazanPlayer[currentPlayer] += pitsPlayer[tempPlayer][pitIndex];
@@ -194,11 +218,12 @@ class _TogyzKumalakBoardState extends State<TogyzKumalakBoard> {
                   GestureDetector(
                     onTap: () {
                       if (currentPlayer == 0 &&
-                          pitsPlayer[currentPlayer][i] > 1) {
+                          pitsPlayer[currentPlayer][i] > 0) {
                         makeMove(i);
                         // Call your game logic function
                         // After the move, toggle the currentPlayer
-                        if (kazanPlayer[0] > 81 || kazanPlayer[1] > 81) gameEnd();
+                        if (kazanPlayer[0] > 81 || kazanPlayer[1] > 81)
+                          gameEnd();
                         setState(() {
                           currentPlayer = (currentPlayer + 1) % 2;
                         });
@@ -237,9 +262,10 @@ class _TogyzKumalakBoardState extends State<TogyzKumalakBoard> {
                   GestureDetector(
                     onTap: () {
                       if (currentPlayer == 1 &&
-                          pitsPlayer[currentPlayer][i] > 1) {
+                          pitsPlayer[currentPlayer][i] > 0) {
                         makeMove(i);
-                        if (kazanPlayer[0] > 81 || kazanPlayer[1] > 81) gameEnd();
+                        if (kazanPlayer[0] > 81 || kazanPlayer[1] > 81)
+                          gameEnd();
                         // Call your game logic function
                         // After the move, toggle the currentPlayer
                         setState(() {
