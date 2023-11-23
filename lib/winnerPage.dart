@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 class WinnerPage extends StatelessWidget {
   final String winnerName;
   final Function resetGame;

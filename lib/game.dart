@@ -95,7 +95,6 @@ class TogyzKumalakAI {
         }
       }
     }
-    print(score);
     return score;
   }
 }

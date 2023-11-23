@@ -1,7 +1,18 @@
 import 'package:togyz_qumalaq/game.dart';
+import 'package:togyz_qumalaq/loginPage.dart';
 import 'package:flutter/material.dart';
 import 'startPage.dart';
 import 'package:flutter/services.dart';
+
+void main() {WidgetsFlutterBinding.ensureInitialized();
+    SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeRight,
+    DeviceOrientation.landscapeLeft,
+  ]).then((_) {
+    runApp(MyApp());
+  });
+}
+
 
 class mainPage extends StatelessWidget {
   @override
