@@ -3,17 +3,6 @@ import 'package:flutter/material.dart';
 import 'startPage.dart';
 import 'package:flutter/services.dart';
 
-
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-    SystemChrome.setPreferredOrientations([
-    DeviceOrientation.landscapeRight,
-    DeviceOrientation.landscapeLeft,
-  ]).then((_) {
-    runApp(mainPage());
-  });
-}
-
 class mainPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

@@ -7,6 +7,10 @@ class TogyzQumalaqGame extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        primarySwatch: Colors.orange,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
       home: Scaffold(
         appBar: AppBar(
           title: Text('Togyz Qumalaq Game'),
@@ -325,6 +329,7 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
                           shape: BoxShape.rectangle,
                           border: Border.all(
                             color: Colors.black,
+
                           ),
                           color: i == tuzdyq[1] ? Colors.red : Colors.white,
                         ),
