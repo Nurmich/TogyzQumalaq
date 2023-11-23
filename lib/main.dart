@@ -2,8 +2,6 @@ import 'package:togyz_qumalaq/game.dart';
 import 'package:flutter/material.dart';
 import 'startPage.dart';
 
-void main() => runApp(mainPage());
-
 class mainPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
