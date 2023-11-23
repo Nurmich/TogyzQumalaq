@@ -6,6 +6,10 @@ class TogyzQumalaqGame extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        primarySwatch: Colors.orange,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
       home: Scaffold(
         appBar: AppBar(
           title: Text('Togyz Qumalaq Game'),
@@ -154,8 +158,7 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
                         setState(() {
                           currentPlayer = (currentPlayer + 1) % 2;
                         });
-                      }
-                      else 
+                      } else
                         checkMoves();
                     },
                     child: Column(
@@ -201,8 +204,7 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
                         setState(() {
                           currentPlayer = (currentPlayer + 1) % 2;
                         });
-                      }
-                      else 
+                      } else
                         checkMoves();
                     },
                     child: Column(
