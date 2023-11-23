@@ -1,8 +1,18 @@
 import 'package:togyz_qumalaq/game.dart';
 import 'package:flutter/material.dart';
 import 'startPage.dart';
+import 'package:flutter/services.dart';
 
-void main() => runApp(mainPage());
+
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+    SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeRight,
+    DeviceOrientation.landscapeLeft,
+  ]).then((_) {
+    runApp(mainPage());
+  });
+}
 
 class mainPage extends StatelessWidget {
   @override
