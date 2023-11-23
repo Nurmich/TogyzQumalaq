@@ -128,16 +128,18 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
     }
   }
 
+  
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text('Player ${currentPlayer + 1}\'s Turn'),
-        Row(
+        Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Column(
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 for (int i = 0; i < 9; i++)
                   GestureDetector(
@@ -153,15 +155,17 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
                           currentPlayer = (currentPlayer + 1) % 2;
                         });
                       }
+                      else 
+                        checkMoves();
                     },
-                    child: Row(
+                    child: Column(
                       children: [
                         Text('${i + 1}'),
                         Container(
                           width: 50,
                           height: 50,
                           decoration: BoxDecoration(
-                            shape: BoxShape.circle,
+                            shape: BoxShape.rectangle,
                             border: Border.all(
                               color: Colors.black,
                             ),
@@ -181,7 +185,8 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
               ],
             ),
             SizedBox(width: 20),
-            Column(
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 for (int i = 8; i >= 0; i--)
                   GestureDetector(
@@ -197,14 +202,16 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
                           currentPlayer = (currentPlayer + 1) % 2;
                         });
                       }
+                      else 
+                        checkMoves();
                     },
-                    child: Row(
+                    child: Column(
                       children: [
                         Container(
                           width: 50,
                           height: 50,
                           decoration: BoxDecoration(
-                            shape: BoxShape.circle,
+                            shape: BoxShape.rectangle,
                             border: Border.all(
                               color: Colors.black,
                             ),
@@ -228,5 +235,5 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
         ),
       ],
     );
-  }
+  } 
 }
