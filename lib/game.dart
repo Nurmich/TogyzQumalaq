@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'winnerPage.dart';
 import 'drawPage.dart';
+import 'dart:math';
 
 class TogyzQumalaqGame extends StatelessWidget {
   @override
@@ -20,6 +21,87 @@ class TogyzQumalaqGame extends StatelessWidget {
   }
 }
 
+class TogyzKumalakAI {
+  int playerNumber;
+  int maxDepth;
+
+  TogyzKumalakAI(this.playerNumber, [this.maxDepth = 3]);
+
+  int findBestMove(_TogyzQumalaqBoardState currentGame) {
+    int bestMove = 0;
+    int bestValue = -999999999;
+
+    for (var move in currentGame.getLegalMoves()) {
+      currentGame.makeMove(move);
+      var moveValue = minimax(currentGame, 0, false);
+      currentGame.undoMove();
+
+      if (moveValue > bestValue) {
+        bestValue = moveValue;
+        bestMove = move;
+      }
+    }
+
+    return bestMove;
+  }
+
+  int minimax(
+      _TogyzQumalaqBoardState currentGame, int depth, bool isMaximizingPlayer) {
+    currentGame.checkMoves();
+    if (depth == maxDepth) {
+      return evaluateGameState(currentGame);
+    }
+
+    if (isMaximizingPlayer) {
+      int maxEval = -999999999;
+      for (var move in currentGame.getLegalMoves()) {
+        currentGame.makeMove(move);
+        var eval = minimax(currentGame, depth + 1, false);
+        currentGame.undoMove();
+        maxEval = max(maxEval, eval);
+      }
+      return maxEval;
+    } else {
+      int minEval = 999999999;
+      for (var move in currentGame.getLegalMoves()) {
+        currentGame.makeMove(move);
+        var eval = minimax(currentGame, depth + 1, true);
+        currentGame.undoMove();
+        minEval = min(minEval, eval);
+      }
+      return minEval;
+    }
+  }
+
+  int evaluateGameState(_TogyzQumalaqBoardState currentGame) {
+    int score;
+
+    // Basic evaluation based on Kazan
+    if (currentGame.currentPlayer == 0) {
+      score = -(currentGame.kazanPlayer[1] - currentGame.kazanPlayer[0]);
+    } else {
+      score = currentGame.kazanPlayer[1] - currentGame.kazanPlayer[0];
+    }
+
+    // Additional scoring for Tuzdyq control
+    int tuzdyqValue =
+        10; // Adjust this value based on the strategic value of Tuzdyq
+    for (int player in [0, 1]) {
+      if (currentGame.tuzdyq[player] != -1) {
+        if (currentGame.currentPlayer == player) {
+          score += tuzdyqValue;
+        } else {
+          score -= tuzdyqValue;
+        }
+      }
+    }
+    print(score);
+    return score;
+  }
+}
+
+// Helper classes like CurrentGame need to be defined in Dart as well.
+
 class TogyzQumalaqBoard extends StatefulWidget {
   @override
   _TogyzQumalaqBoardState createState() => _TogyzQumalaqBoardState();
@@ -33,6 +115,10 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
   List<int> kazanPlayer = List.generate(2, (index) => 0);
   int currentPlayer = 0;
   List<int> tuzdyq = List.generate(2, (index) => -1);
+
+  List<Map<String, dynamic>> history = [];
+
+  TogyzKumalakAI gameAI = TogyzKumalakAI(1, 3);
 
   void resetGame() {
     setState(() {
@@ -75,10 +161,48 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
     }
   }
 
+  List<int> getLegalMoves() {
+    List<int> legalMoves = [];
+    for (int i = 0; i < 9; i++) {
+      if (pitsPlayer[1][i] != 0) {
+        legalMoves.add(i);
+      }
+    }
+    return legalMoves;
+  }
+
+  Map<String, dynamic> saveState() {
+    return {
+      'pits': List<List<int>>.from(
+          pitsPlayer.map((playerPits) => List<int>.from(playerPits))),
+      'kazan': List<int>.from(kazanPlayer),
+      'tuzdyq': List<int>.from(tuzdyq),
+      'currentPlayer': currentPlayer,
+    };
+  }
+
+  void undoMove() {
+    if (history == List.empty()) {
+      return;
+    }
+    Map<String, dynamic> last_state = history.removeLast();
+
+    setState(() {
+      pitsPlayer = last_state['pits'];
+      kazanPlayer = last_state['kazan'];
+      tuzdyq = last_state['tuzdyq'];
+      currentPlayer = last_state['currentPlayer'];
+    });
+  }
+
   void makeMove(int pitIndex) {
     // Implement game logic here
     // Update pits, kazans, and currentPlayer accordingly
     checkMoves();
+
+    Map<String, dynamic> state_before_move = saveState();
+    history.add(state_before_move);
+
     int temp = pitsPlayer[currentPlayer][pitIndex];
     int tempPlayer = currentPlayer;
     pitsPlayer[tempPlayer][pitIndex] = 0;
@@ -132,7 +256,6 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
     }
   }
 
-  
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -157,6 +280,10 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
                           gameEnd();
                         setState(() {
                           currentPlayer = (currentPlayer + 1) % 2;
+                          Future.delayed(Duration(milliseconds: 3000), () {
+                            makeMove(gameAI.findBestMove(this));
+                            currentPlayer = (currentPlayer + 1) % 2;
+                          });
                         });
                       } else
                         checkMoves();
@@ -185,6 +312,7 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
                     ),
                   ),
                 Text('Kazan 1: ${kazanPlayer[0]}'),
+                // ElevatedButton(onPressed: undoMove, child: Text("Kenzh mal")),
               ],
             ),
             SizedBox(width: 20),
@@ -192,43 +320,28 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 for (int i = 8; i >= 0; i--)
-                  GestureDetector(
-                    onTap: () {
-                      if (currentPlayer == 1 &&
-                          pitsPlayer[currentPlayer][i] > 0) {
-                        makeMove(i);
-                        if (kazanPlayer[0] > 81 || kazanPlayer[1] > 81)
-                          gameEnd();
-                        // Call your game logic function
-                        // After the move, toggle the currentPlayer
-                        setState(() {
-                          currentPlayer = (currentPlayer + 1) % 2;
-                        });
-                      } else
-                        checkMoves();
-                    },
-                    child: Column(
-                      children: [
-                        Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.rectangle,
-                            border: Border.all(
-                              color: Colors.black,
-                            ),
-                            color: i == tuzdyq[1] ? Colors.red : Colors.white,
+                  Column(
+                    children: [
+                      Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.rectangle,
+                          border: Border.all(
+                            color: Colors.black,
+
                           ),
-                          child: Center(
-                            child: Text(
-                              pitsPlayer[1][i].toString(),
-                              style: TextStyle(fontSize: 20),
-                            ),
+                          color: i == tuzdyq[1] ? Colors.red : Colors.white,
+                        ),
+                        child: Center(
+                          child: Text(
+                            pitsPlayer[1][i].toString(),
+                            style: TextStyle(fontSize: 20),
                           ),
                         ),
-                        Text('${i + 1}')
-                      ],
-                    ),
+                      ),
+                      Text('${i + 1}')
+                    ],
                   ),
                 Text('Kazan 2: ${kazanPlayer[1]}'),
               ],
@@ -237,5 +350,5 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
         ),
       ],
     );
-  } 
+  }
 }
