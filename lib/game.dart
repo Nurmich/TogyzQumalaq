@@ -132,6 +132,7 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
     }
   }
 
+  
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -236,5 +237,5 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
         ),
       ],
     );
-  }
+  } 
 }

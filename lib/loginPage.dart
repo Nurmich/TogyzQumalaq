@@ -5,8 +5,13 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:togyz_qumalaq/main.dart';
 import 'package:togyz_qumalaq/registerPage.dart';
 
-void main() {
-  runApp(MyApp());
+void main() {WidgetsFlutterBinding.ensureInitialized();
+    SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeRight,
+    DeviceOrientation.landscapeLeft,
+  ]).then((_) {
+    runApp(MyApp());
+  });
 }
 
 class MyApp extends StatelessWidget {

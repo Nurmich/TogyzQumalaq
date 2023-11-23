@@ -1,6 +1,7 @@
 import 'package:togyz_qumalaq/game.dart';
 import 'package:flutter/material.dart';
 import 'startPage.dart';
+import 'package:flutter/services.dart';
 
 class mainPage extends StatelessWidget {
   @override
