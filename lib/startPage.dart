@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:togyz_qumalaq/difficultyPage.dart';
 import 'game.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'loginPage.dart';
@@ -147,7 +148,7 @@ class StartPage extends StatelessWidget {
                 getSession();
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => TogyzQumalaqGame()),
+                  MaterialPageRoute(builder: (context) => DifficultyPage()),
                 );
               },
               child: Text('Start Game'),

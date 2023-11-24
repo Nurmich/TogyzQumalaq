@@ -7,6 +7,9 @@ import 'dart:math';
 import 'package:http/http.dart' as http;
 
 class TogyzQumalaqGame extends StatelessWidget {
+  final int difficulty;
+
+  TogyzQumalaqGame({Key? key, required this.difficulty}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -18,7 +21,7 @@ class TogyzQumalaqGame extends StatelessWidget {
         appBar: AppBar(
           title: Text('Togyz Qumalaq Game'),
         ),
-        body: TogyzQumalaqBoard(),
+        body: TogyzQumalaqBoard(difficulty: difficulty),
       ),
     );
   }
@@ -105,6 +108,9 @@ class TogyzKumalakAI {
 // Helper classes like CurrentGame need to be defined in Dart as well.
 
 class TogyzQumalaqBoard extends StatefulWidget {
+  final int difficulty;
+
+  TogyzQumalaqBoard({Key? key, required this.difficulty}) : super(key: key);
   @override
   _TogyzQumalaqBoardState createState() => _TogyzQumalaqBoardState();
 }
@@ -156,7 +162,7 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
 
   List<Map<String, dynamic>> history = [];
 
-  TogyzKumalakAI gameAI = TogyzKumalakAI(1, 3);
+  TogyzKumalakAI gameAI = TogyzKumalakAI(1, 0);
 
   void resetGame() {
     setState(() {
@@ -298,6 +304,7 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
 
   @override
   Widget build(BuildContext context) {
+    gameAI = TogyzKumalakAI(1, widget.difficulty);
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -325,14 +332,13 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
                           gameEnd();
                         setState(() {
                           currentPlayer = (currentPlayer + 1) % 2;
-                          Future.delayed(Duration(milliseconds: 3000), () {
+                          Future.delayed(Duration(milliseconds: 1000), () {
                             Map<String, dynamic> state_before_move =
                                 makeMove(gameAI.findBestMove(this));
                             List<int> kazan = state_before_move['kazan'];
                             List<int> tuzdyq = state_before_move['tuzdyq'];
                             List<List<int>> pits = state_before_move['pits'];
                             postGameHistory(kazan, tuzdyq, pits);
-
                             currentPlayer = (currentPlayer + 1) % 2;
                           });
                         });
