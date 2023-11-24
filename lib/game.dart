@@ -1,7 +1,10 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'winnerPage.dart';
 import 'drawPage.dart';
 import 'dart:math';
+import 'package:http/http.dart' as http;
 
 class TogyzQumalaqGame extends StatelessWidget {
   @override
@@ -95,7 +98,6 @@ class TogyzKumalakAI {
         }
       }
     }
-    print(score);
     return score;
   }
 }
@@ -108,6 +110,42 @@ class TogyzQumalaqBoard extends StatefulWidget {
 }
 
 class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
+  final TextEditingController gameSessionController = TextEditingController();
+  final TextEditingController pitsController = TextEditingController();
+  final TextEditingController kazanController = TextEditingController();
+  final TextEditingController tuzdyqController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
+  final FlutterSecureStorage storage = FlutterSecureStorage();
+
+  Future<void> postGameHistory(
+      List<int> kazan, List<int> tuzdyq, List<List<int>> pits) async {
+    var url = Uri.parse('http://77.243.80.52:8000/games/game_histories/');
+    String? gameSession = await storage.read(key: 'session_id');
+    var body = json.encode({
+      "game_session": gameSession,
+      "pits": pits,
+      "kazan": kazan,
+      "tuzdyq": tuzdyq
+    });
+
+    try {
+      var response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: body,
+      );
+
+      if (response.statusCode == 200) {
+        print('Success: ${response.body}');
+      } else {
+        print('Error: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      print('Exception occurred: $e');
+    }
+  }
+
   List<List<int>> pitsPlayer =
       List.generate(2, (index) => List.generate(9, (index) => 9));
   // List<int> pitsPlayer1 = List.generate(9, (index) => 9); // Player 1's pits
@@ -195,12 +233,13 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
     });
   }
 
-  void makeMove(int pitIndex) {
+  Map<String, dynamic> makeMove(int pitIndex) {
     // Implement game logic here
     // Update pits, kazans, and currentPlayer accordingly
     checkMoves();
 
     Map<String, dynamic> state_before_move = saveState();
+
     history.add(state_before_move);
 
     int temp = pitsPlayer[currentPlayer][pitIndex];
@@ -254,6 +293,7 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
         pitsPlayer[tempPlayer][pitIndex] = 0;
       }
     }
+    return state_before_move;
   }
 
   @override
@@ -273,7 +313,12 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
                     onTap: () {
                       if (currentPlayer == 0 &&
                           pitsPlayer[currentPlayer][i] > 0) {
-                        makeMove(i);
+                        // makeMove(i);
+                        Map<String, dynamic> state_before_move = makeMove(i);
+                        List<int> kazan = state_before_move['kazan'];
+                        List<int> tuzdyq = state_before_move['tuzdyq'];
+                        List<List<int>> pits = state_before_move['pits'];
+                        postGameHistory(kazan, tuzdyq, pits);
                         // Call your game logic function
                         // After the move, toggle the currentPlayer
                         if (kazanPlayer[0] > 81 || kazanPlayer[1] > 81)
@@ -281,7 +326,13 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
                         setState(() {
                           currentPlayer = (currentPlayer + 1) % 2;
                           Future.delayed(Duration(milliseconds: 3000), () {
-                            makeMove(gameAI.findBestMove(this));
+                            Map<String, dynamic> state_before_move =
+                                makeMove(gameAI.findBestMove(this));
+                            List<int> kazan = state_before_move['kazan'];
+                            List<int> tuzdyq = state_before_move['tuzdyq'];
+                            List<List<int>> pits = state_before_move['pits'];
+                            postGameHistory(kazan, tuzdyq, pits);
+
                             currentPlayer = (currentPlayer + 1) % 2;
                           });
                         });
@@ -329,7 +380,6 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
                           shape: BoxShape.rectangle,
                           border: Border.all(
                             color: Colors.black,
-
                           ),
                           color: i == tuzdyq[1] ? Colors.red : Colors.white,
                         ),

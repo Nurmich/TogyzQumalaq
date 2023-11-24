@@ -8,12 +8,60 @@ import 'package:http/http.dart' as http;
 class StartPage extends StatelessWidget {
   final FlutterSecureStorage storage = FlutterSecureStorage();
 
+  Future<void> createSession(BuildContext context) async {
+    var url = Uri.parse('http://77.243.80.52:8000/games/game_sessions/');
+    print('I\'m here');
+    String? userId = await storage.read(key: 'user_id');
+    print(userId);
+    try {
+      var response = await http.post(
+        url,
+        body: {'user': userId},
+      );
+
+      if (response.statusCode == 201) {
+        // Registration successful
+        print('Session started successfully');
+      } else {
+        // Error handling
+        print('Failed to start a session');
+      }
+    } catch (e) {
+      print('Error occurred while registering: $e');
+    }
+  }
+
+  Future<void> getSession() async {
+    var url = Uri.parse('http://77.243.80.52:8000/games/game_sessions/');
+    String? token = await storage.read(
+        key: 'token'); // Assuming you're using a token for authorization
+
+    try {
+      var response = await http.get(
+        url,
+        headers: token != null ? {'Authorization': 'Bearer $token'} : {},
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+
+        // Example: Storing the first 'id' from the list
+        if (data.isNotEmpty) {
+          await storage.write(
+              key: 'session_id', value: data.last['id'].toString());
+        }
+      } else {
+        print(
+            'Failed to retrieve session. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error occurred while retrieving session: $e');
+    }
+  }
+
   // Function to handle logout
   void logout(BuildContext context) async {
-    await storage.delete(key: 'token');
-    await storage.delete(key: 'username');
-    await storage.delete(key: 'first_name');
-    await storage.delete(key: 'last_name');
+    await storage.deleteAll();
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (context) => LoginScreen()),
       (Route<dynamic> route) => false,
@@ -32,7 +80,7 @@ class StartPage extends StatelessWidget {
     String? token = await storage.read(key: "token");
 
     if (token == null) {
-      throw Exception('Authorization token not found');
+      LoginScreen();
     }
 
     final response = await http.get(
@@ -76,9 +124,11 @@ class StartPage extends StatelessWidget {
               String username = snapshot.data!['username'];
               String firstName = snapshot.data!['first_name'];
               String lastName = snapshot.data!['last_name'];
+              String userId = snapshot.data!['id'].toString();
               storage.write(key: 'first_name', value: firstName);
               storage.write(key: 'username', value: username);
               storage.write(key: 'last_name', value: lastName);
+              storage.write(key: 'user_id', value: userId);
               print(printAllValues());
               return Text('$firstName $lastName');
             } else {
@@ -93,6 +143,8 @@ class StartPage extends StatelessWidget {
           children: [
             ElevatedButton(
               onPressed: () {
+                createSession(context);
+                getSession();
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => TogyzQumalaqGame()),
