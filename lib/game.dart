@@ -4,6 +4,9 @@ import 'drawPage.dart';
 import 'dart:math';
 
 class TogyzQumalaqGame extends StatelessWidget {
+  final int difficulty;
+
+  TogyzQumalaqGame({Key? key, required this.difficulty}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -15,7 +18,7 @@ class TogyzQumalaqGame extends StatelessWidget {
         appBar: AppBar(
           title: Text('Togyz Qumalaq Game'),
         ),
-        body: TogyzQumalaqBoard(),
+        body: TogyzQumalaqBoard(difficulty: difficulty),
       ),
     );
   }
@@ -102,6 +105,9 @@ class TogyzKumalakAI {
 // Helper classes like CurrentGame need to be defined in Dart as well.
 
 class TogyzQumalaqBoard extends StatefulWidget {
+  final int difficulty;
+
+  TogyzQumalaqBoard({Key? key, required this.difficulty}) : super(key: key);
   @override
   _TogyzQumalaqBoardState createState() => _TogyzQumalaqBoardState();
 }
@@ -117,7 +123,7 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
 
   List<Map<String, dynamic>> history = [];
 
-  TogyzKumalakAI gameAI = TogyzKumalakAI(1, 3);
+  TogyzKumalakAI gameAI = TogyzKumalakAI(1, 0);
 
   void resetGame() {
     setState(() {
@@ -257,6 +263,7 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
 
   @override
   Widget build(BuildContext context) {
+    gameAI = TogyzKumalakAI(1, widget.difficulty);
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -279,7 +286,7 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
                           gameEnd();
                         setState(() {
                           currentPlayer = (currentPlayer + 1) % 2;
-                          Future.delayed(Duration(milliseconds: 3000), () {
+                          Future.delayed(Duration(milliseconds: 1000), () {
                             makeMove(gameAI.findBestMove(this));
                             currentPlayer = (currentPlayer + 1) % 2;
                           });
@@ -328,7 +335,6 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
                           shape: BoxShape.rectangle,
                           border: Border.all(
                             color: Colors.black,
-
                           ),
                           color: i == tuzdyq[1] ? Colors.red : Colors.white,
                         ),

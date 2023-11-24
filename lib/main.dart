@@ -21,8 +21,6 @@ class mainPage extends StatelessWidget {
       initialRoute: '/', // Set the initial route to '/'
       routes: {
         '/': (context) => StartPage(), // Define the route for the StartPage
-        '/game': (context) =>
-            TogyzQumalaqGame(), // Define the route for the game page
       },
     );
   }
