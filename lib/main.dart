@@ -20,6 +20,10 @@ class mainPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        primarySwatch: createMaterialColor(Color(0xFFCA854E)),
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
       initialRoute: '/', // Set the initial route to '/'
       routes: {
         '/': (context) => StartPage(), // Define the route for the StartPage

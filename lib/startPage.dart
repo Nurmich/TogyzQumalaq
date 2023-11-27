@@ -158,8 +158,9 @@ class StartPage extends StatelessWidget {
               onPressed: () => logout(context),
               child: Text('Logout'),
               style: ElevatedButton.styleFrom(
-                primary: Colors.black, // Logout button color
-              ),
+                  primary: Color(0xFFD1B280),
+                  onPrimary: Colors.white // Logout button color
+                  ),
             ),
           ],
         ),

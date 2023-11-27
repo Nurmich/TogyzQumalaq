@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:togyz_qumalaq/difficultyPage.dart';
 
 class DrawPage extends StatelessWidget {
   final Function resetGame;
@@ -22,11 +22,10 @@ class DrawPage extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () {
-                // Reset game state here (score, board, etc.)
-                // You can call a function to reset the game state
-                resetGame();
-                // Navigate back to the game page
-                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => DifficultyPage()),
+                );
               },
               child: Text('Restart Game'),
             ),
@@ -37,4 +36,3 @@ class DrawPage extends StatelessWidget {
     );
   }
 }
-

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:togyz_qumalaq/loginPage.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'winnerPage.dart';
 import 'drawPage.dart';
@@ -14,7 +15,7 @@ class TogyzQumalaqGame extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        primarySwatch: Colors.orange,
+        primarySwatch: createMaterialColor(Color(0xFFCA854E)),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: Scaffold(
@@ -305,106 +306,125 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
   @override
   Widget build(BuildContext context) {
     gameAI = TogyzKumalakAI(1, widget.difficulty);
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text('Player ${currentPlayer + 1}\'s Turn'),
-        Column(
+    return Container(
+        color: Color(0xFF9F6B3C),
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Row(
+            Text(
+                style: TextStyle(color: Colors.white),
+                'Player ${currentPlayer + 1}\'s Turn'),
+            Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                for (int i = 0; i < 9; i++)
-                  GestureDetector(
-                    onTap: () {
-                      if (currentPlayer == 0 &&
-                          pitsPlayer[currentPlayer][i] > 0) {
-                        // makeMove(i);
-                        Map<String, dynamic> state_before_move = makeMove(i);
-                        List<int> kazan = state_before_move['kazan'];
-                        List<int> tuzdyq = state_before_move['tuzdyq'];
-                        List<List<int>> pits = state_before_move['pits'];
-                        postGameHistory(kazan, tuzdyq, pits);
-                        // Call your game logic function
-                        // After the move, toggle the currentPlayer
-                        if (kazanPlayer[0] > 81 || kazanPlayer[1] > 81)
-                          gameEnd();
-                        setState(() {
-                          currentPlayer = (currentPlayer + 1) % 2;
-                          Future.delayed(Duration(milliseconds: 1000), () {
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    for (int i = 0; i < 9; i++)
+                      GestureDetector(
+                        onTap: () {
+                          if (currentPlayer == 0 &&
+                              pitsPlayer[currentPlayer][i] > 0) {
+                            // makeMove(i);
                             Map<String, dynamic> state_before_move =
-                                makeMove(gameAI.findBestMove(this));
+                                makeMove(i);
                             List<int> kazan = state_before_move['kazan'];
                             List<int> tuzdyq = state_before_move['tuzdyq'];
                             List<List<int>> pits = state_before_move['pits'];
                             postGameHistory(kazan, tuzdyq, pits);
-                            currentPlayer = (currentPlayer + 1) % 2;
-                          });
-                        });
-                      } else
-                        checkMoves();
-                    },
-                    child: Column(
-                      children: [
-                        Text('${i + 1}'),
-                        Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.rectangle,
-                            border: Border.all(
-                              color: Colors.black,
+                            // Call your game logic function
+                            // After the move, toggle the currentPlayer
+                            if (kazanPlayer[0] > 81 || kazanPlayer[1] > 81)
+                              gameEnd();
+                            setState(() {
+                              currentPlayer = (currentPlayer + 1) % 2;
+                              Future.delayed(Duration(milliseconds: 1000), () {
+                                Map<String, dynamic> state_before_move =
+                                    makeMove(gameAI.findBestMove(this));
+                                List<int> kazan = state_before_move['kazan'];
+                                List<int> tuzdyq = state_before_move['tuzdyq'];
+                                List<List<int>> pits =
+                                    state_before_move['pits'];
+                                postGameHistory(kazan, tuzdyq, pits);
+                                currentPlayer = (currentPlayer + 1) % 2;
+                              });
+                            });
+                          } else
+                            checkMoves();
+                        },
+                        child: Column(
+                          children: [
+                            Text(
+                                style: TextStyle(color: Colors.white),
+                                '${i + 1}'),
+                            Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.rectangle,
+                                border: Border.all(
+                                  color: Colors.white,
+                                ),
+                                color: i == tuzdyq[0]
+                                    ? Colors.red
+                                    : Color(0xFF9F6B3C),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  pitsPlayer[0][i].toString(),
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 20),
+                                ),
+                              ),
                             ),
-                            color: i == tuzdyq[0] ? Colors.red : Colors.white,
-                          ),
-                          child: Center(
-                            child: Text(
-                              pitsPlayer[0][i].toString(),
-                              style: TextStyle(fontSize: 20),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                Text(' Kazan 1: ${kazanPlayer[0]}'),
-                // ElevatedButton(onPressed: undoMove, child: Text("Kenzh mal")),
-              ],
-            ),
-            SizedBox(width: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                for (int i = 8; i >= 0; i--)
-                  Column(
-                    children: [
-                      Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.rectangle,
-                          border: Border.all(
-                            color: Colors.black,
-                          ),
-                          color: i == tuzdyq[1] ? Colors.red : Colors.white,
-                        ),
-                        child: Center(
-                          child: Text(
-                            pitsPlayer[1][i].toString(),
-                            style: TextStyle(fontSize: 20),
-                          ),
+                          ],
                         ),
                       ),
-                      Text('${i + 1}')
-                    ],
-                  ),
-                Text(' Kazan 2: ${kazanPlayer[1]}'),
+                    Text(
+                        style: TextStyle(color: Colors.white),
+                        ' Kazan 1: ${kazanPlayer[0]}'),
+                    // ElevatedButton(onPressed: undoMove, child: Text("Kenzh mal")),
+                  ],
+                ),
+                SizedBox(width: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    for (int i = 8; i >= 0; i--)
+                      Column(
+                        children: [
+                          Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.rectangle,
+                              border: Border.all(
+                                color: Colors.white,
+                              ),
+                              color: i == tuzdyq[1]
+                                  ? Colors.red
+                                  : Color(0xFF9F6B3C),
+                            ),
+                            child: Center(
+                              child: Text(
+                                pitsPlayer[1][i].toString(),
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 20),
+                              ),
+                            ),
+                          ),
+                          Text(
+                              style: TextStyle(color: Colors.white), '${i + 1}')
+                        ],
+                      ),
+                    Text(
+                        style: TextStyle(color: Colors.white),
+                        ' Kazan 2: ${kazanPlayer[1]}'),
+                  ],
+                ),
               ],
             ),
           ],
-        ),
-      ],
-    );
+        ));
   }
 }

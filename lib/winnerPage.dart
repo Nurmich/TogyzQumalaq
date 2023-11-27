@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:togyz_qumalaq/difficultyPage.dart';
 
 class WinnerPage extends StatelessWidget {
   final String winnerName;
@@ -22,11 +23,10 @@ class WinnerPage extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () {
-                // Reset game state here (score, board, etc.)
-                // You can call a function to reset the game state
-                resetGame();
-                // Navigate back to the game page
-                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => DifficultyPage()),
+                );
               },
               child: Text('Restart Game'),
             ),

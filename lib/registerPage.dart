@@ -41,6 +41,8 @@ class RegisterScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
@@ -48,7 +50,12 @@ class RegisterScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              SizedBox(height: 60),
+              Image.asset(
+                'assets/in_app_logo.png',
+                height: screenSize.height * 0.15, // Adjust the size as needed
+              ),
+              SizedBox(height: 10),
+
               // Replace with your logo or image file
               Text(
                 'Create Account',
@@ -57,11 +64,11 @@ class RegisterScreen extends StatelessWidget {
               ),
               SizedBox(height: 8),
               Text(
-                'Hi, kindly fill in the form to proceed combat',
+                'Fill in the form to proceed combat',
                 style: TextStyle(fontSize: 16),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 48),
+              SizedBox(height: 26),
               TextField(
                 controller: usernameController,
                 decoration: InputDecoration(
@@ -107,7 +114,7 @@ class RegisterScreen extends StatelessWidget {
               ElevatedButton(
                 child: Text('Create Account'),
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.orange, // Background color
+                  primary: Color(0xFFCA854E), // Background color
                   onPrimary: Colors.white, // Text Color (Foreground color)
                 ),
                 onPressed: () {

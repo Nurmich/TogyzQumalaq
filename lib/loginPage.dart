@@ -5,26 +5,37 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:togyz_qumalaq/main.dart';
 import 'package:togyz_qumalaq/registerPage.dart';
 
+MaterialColor createMaterialColor(Color color) {
+  List strengths = <double>[.05];
+  Map<int, Color> swatch = {};
+  final int r = color.red, g = color.green, b = color.blue;
+
+  for (int i = 1; i < 10; i++) {
+    strengths.add(0.1 * i);
+  }
+
+  strengths.forEach((strength) {
+    final double ds = 0.5 - strength;
+    swatch[(strength * 1000).round()] = Color.fromRGBO(
+      r + ((ds < 0 ? r : (255 - r)) * ds).round(),
+      g + ((ds < 0 ? g : (255 - g)) * ds).round(),
+      b + ((ds < 0 ? b : (255 - b)) * ds).round(),
+      1,
+    );
+  });
+  return MaterialColor(color.value, swatch);
+}
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Login Screen',
       theme: ThemeData(
-        primarySwatch: Colors.orange,
+        primarySwatch: createMaterialColor(Color(0xFFCA854E)),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: LoginScreen(),
-    );
-  }
-}
-
-class HomeScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Home')),
-      body: Center(child: Text('Welcome to the Home Screen!')),
     );
   }
 }
@@ -104,8 +115,10 @@ class LoginScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 // Logo placeholder
-                FlutterLogo(
-                    size: screenSize.height * 0.1), // Adjust the size as needed
+                Image.asset(
+                  'assets/in_app_logo.png',
+                  height: screenSize.height * 0.1, // Adjust the size as needed
+                ),
                 SizedBox(height: padding),
                 Text(
                   'Welcome Back!',
@@ -114,7 +127,7 @@ class LoginScreen extends StatelessWidget {
                 ),
                 SizedBox(height: padding),
                 Text(
-                  'Hi, kindly login to continue battle',
+                  'Login to continue battle',
                   style: TextStyle(fontSize: 16),
                   textAlign: TextAlign.center,
                 ),
@@ -139,7 +152,7 @@ class LoginScreen extends StatelessWidget {
                 ElevatedButton(
                     child: Text('Let\'s Combat!'),
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.orange,
+                      primary: Color(0xFFCA854E),
                       onPrimary: Colors.white,
                       minimumSize: Size(buttonWidth, buttonHeight),
                     ),
@@ -173,6 +186,10 @@ class LoginScreen extends StatelessWidget {
                 Align(
                   alignment: Alignment.center,
                   child: TextButton(
+                    style: TextButton.styleFrom(
+                      primary: Color(0xFFCA854E),
+                      minimumSize: Size(buttonWidth, buttonHeight),
+                    ),
                     child: Text('Don\'t have an account? Create Account'),
                     onPressed: () {
                       Navigator.push(
