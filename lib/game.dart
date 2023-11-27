@@ -368,7 +368,7 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
                       ],
                     ),
                   ),
-                Text('Kazan 1: ${kazanPlayer[0]}'),
+                Text(' Kazan 1: ${kazanPlayer[0]}'),
                 // ElevatedButton(onPressed: undoMove, child: Text("Kenzh mal")),
               ],
             ),
@@ -399,7 +399,7 @@ class _TogyzQumalaqBoardState extends State<TogyzQumalaqBoard> {
                       Text('${i + 1}')
                     ],
                   ),
-                Text('Kazan 2: ${kazanPlayer[1]}'),
+                Text(' Kazan 2: ${kazanPlayer[1]}'),
               ],
             ),
           ],

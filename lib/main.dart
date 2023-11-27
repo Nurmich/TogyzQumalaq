@@ -11,6 +11,8 @@ void main() {
     DeviceOrientation.landscapeLeft,
   ]).then((_) {
     runApp(MyApp());
+    // Hide the status bar
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
   });
 }
 
